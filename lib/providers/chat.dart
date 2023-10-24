@@ -112,12 +112,12 @@ class ChatProvider with ChangeNotifier {
 
       addMessage(answerMessage);
       isTyping = false;
-    }).catchError((_) {
+    }).catchError((e) {
       final answerMessage = types.TextMessage(
         author: chatbot,
         createdAt: DateTime.now().millisecondsSinceEpoch,
         id: randomString,
-        text: 'An error occurred.',
+        text: e,
       );
       addMessage(answerMessage);
       isTyping = false;

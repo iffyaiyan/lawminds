@@ -11,14 +11,14 @@ class ChatService {
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
-        return json['answer'] ?? '';
+        return json['answer'] ?? json['detail'] ?? 'An error occurred';
       } else {
         log('Catch Response Error: ${response.body}');
-        throw 'Error Response';
+        throw 'An error occurred';
       }
     } catch (e) {
       log('Catch Error: $e');
-      rethrow;
+      throw 'An error occurred';
     }
   }
 }
