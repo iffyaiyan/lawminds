@@ -136,6 +136,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (_formKey.currentState!.validate()) {
       context.read<AuthProvider>().register(_emailController.text, _passwordController.text).then((_) {
         Navigator.pushReplacementNamed(context, Routes.dashboard);
+      }).catchError((_) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Signup failed'),
+          backgroundColor: Colors.red,
+        ));
       });
     }
   }

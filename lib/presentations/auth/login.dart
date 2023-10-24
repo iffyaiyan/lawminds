@@ -103,7 +103,12 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> onSubmit() async {
     if (_formKey.currentState!.validate()) {
       context.read<AuthProvider>().signIn(_emailController.text, _passwordController.text).then((_) {
-        Navigator.pushReplacementNamed(context, Routes.dashboard);
+        //Navigator.pushReplacementNamed(context, Routes.dashboard);
+      }).catchError((_) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Login failed'),
+          backgroundColor: Colors.red,
+        ));
       });
     }
   }

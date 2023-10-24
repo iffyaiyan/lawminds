@@ -44,31 +44,35 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> signIn(String email, String password) async {
     isLoginProcess = true;
-    await Prefs.setIsLogin(true);
     try {
       await _supabase.auth.signInWithPassword(
         email: email,
         password: password,
       );
 
+      await Prefs.setIsLogin(true);
       isLoginProcess = false;
     } catch (e) {
-      log('$e');
+      isLoginProcess = false;
+      log('Catch Error: $e');
+      rethrow;
     }
   }
 
   Future<void> register(String email, String password) async {
     isRegisterProcess = true;
-    await Prefs.setIsLogin(true);
     try {
       await _supabase.auth.signUp(
         email: email,
         password: password,
       );
 
+      await Prefs.setIsLogin(true);
       isRegisterProcess = false;
     } catch (e) {
-      log('$e');
+      isRegisterProcess = false;
+      log('Catch Error: $e');
+      rethrow;
     }
   }
 }
