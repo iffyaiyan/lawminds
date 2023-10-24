@@ -105,8 +105,8 @@ class _LoginScreenState extends State<LoginScreen> {
       context.read<AuthProvider>().signIn(_emailController.text, _passwordController.text).then((_) {
         Navigator.pushReplacementNamed(context, Routes.dashboard);
       }).catchError((e) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Login Error'),
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('$e'),
           backgroundColor: Colors.red,
         ));
       });

@@ -141,8 +141,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       context.read<AuthProvider>().register(_emailController.text, _passwordController.text).then((_) {
         Navigator.pushReplacementNamed(context, Routes.dashboard);
       }).catchError((e) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Sign Up Error'),
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('$e'),
           backgroundColor: Colors.red,
         ));
       });

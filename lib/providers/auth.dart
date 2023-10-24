@@ -55,7 +55,7 @@ class AuthProvider with ChangeNotifier {
     } catch (e) {
       isLoginProcess = false;
       log('Catch Error: $e');
-      rethrow;
+      throw getError('$e');
     }
   }
 
@@ -72,7 +72,24 @@ class AuthProvider with ChangeNotifier {
     } catch (e) {
       isRegisterProcess = false;
       log('Catch Error: $e');
-      rethrow;
+      throw getError('$e');
+    }
+  }
+
+  String getError(String input) {
+    int messageIndex = input.indexOf("message: ");
+
+    if (messageIndex != -1) {
+      int commaIndex = input.indexOf(',', messageIndex);
+
+      if (commaIndex != -1) {
+        String message = input.substring(messageIndex + "message: ".length, commaIndex);
+        return message.trim();
+      } else {
+        return 'An error occurred. Please try again.';
+      }
+    } else {
+      return 'An error occurred. Please try again.';
     }
   }
 }
