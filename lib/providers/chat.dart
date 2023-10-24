@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:lawminds/services/chat.dart';
 
 import '../constants/assets.dart';
 import '../models/topic.dart';
@@ -17,10 +18,13 @@ class ChatProvider with ChangeNotifier {
   Topic? _selectedTopic;
   final List<types.Message> _messages = [];
   final user = const types.User(id: 'user', firstName: 'You');
+  final chatbot = const types.User(id: 'chatbot', firstName: 'Bot');
+  bool _isTyping = false;
 
   List<Topic> get topics => _topics;
   Topic? get selectedTopic => _selectedTopic;
   List<types.Message> get messages => _messages;
+  bool get isTyping => _isTyping;
 
   String get randomString {
     final random = Random.secure();
@@ -82,7 +86,7 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void onSendPressed(types.PartialText message) {
+  Future<void> onSendPressed(types.PartialText message) async {
     final textMessage = types.TextMessage(
       author: user,
       createdAt: DateTime.now().millisecondsSinceEpoch,
@@ -91,5 +95,23 @@ class ChatProvider with ChangeNotifier {
     );
 
     addMessage(textMessage);
+
+    _isTyping = true;
+    notifyListeners();
+    ChatService().getAnswer(message.text).then((value) {
+      final answerMessage = types.TextMessage(
+        author: chatbot,
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+        id: randomString,
+        text: value,
+      );
+
+      _isTyping = false;
+      notifyListeners();
+      addMessage(answerMessage);
+    }).catchError((_) {
+      _isTyping = false;
+      notifyListeners();
+    });
   }
 }
