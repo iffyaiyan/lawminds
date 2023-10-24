@@ -22,20 +22,19 @@ class ChatProvider with ChangeNotifier {
   Topic? get selectedTopic => _selectedTopic;
   List<types.Message> get messages => _messages;
 
-  set selectedTopic(Topic? val) {
-    _selectedTopic = val;
-    notifyListeners();
-  }
-
   String get randomString {
     final random = Random.secure();
     final values = List<int>.generate(16, (i) => random.nextInt(255));
     return base64UrlEncode(values);
   }
 
-  void loadMessages() async {
-
+  void initChat(Topic item) {
+    _selectedTopic = item;
+    _messages.clear();
+    notifyListeners();
   }
+
+  void loadMessages() {}
 
   void addMessage(types.Message message) {
     _messages.insert(0, message);

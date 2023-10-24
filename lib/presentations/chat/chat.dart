@@ -24,7 +24,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.indigo,
+        backgroundColor: Colors.black,
         elevation: 10,
         foregroundColor: Colors.white,
         title: Text(context.watch<ChatProvider>().selectedTopic?.title ?? ''),
