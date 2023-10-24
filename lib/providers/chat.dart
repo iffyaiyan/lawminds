@@ -13,7 +13,7 @@ class ChatProvider with ChangeNotifier {
     Topic('Sexual Harassment', 'harassment', Assets.harassment),
     Topic('Bullying', 'bully', Assets.bully),
     Topic('Garden Leave', 'termination', Assets.leave),
-    Topic('Workplace Safety', 'safety', Assets.safety),
+    Topic('Office Ethics', 'ethics', Assets.safety),
   ];
   Topic? _selectedTopic;
   final List<types.Message> _messages = [];
@@ -25,6 +25,11 @@ class ChatProvider with ChangeNotifier {
   Topic? get selectedTopic => _selectedTopic;
   List<types.Message> get messages => _messages;
   bool get isTyping => _isTyping;
+
+  set isTyping(bool val) {
+    _isTyping = val;
+    notifyListeners();
+  }
 
   String get randomString {
     final random = Random.secure();
@@ -96,8 +101,7 @@ class ChatProvider with ChangeNotifier {
 
     addMessage(textMessage);
 
-    _isTyping = true;
-    notifyListeners();
+    isTyping = true;
     ChatService().getAnswer(message.text).then((value) {
       final answerMessage = types.TextMessage(
         author: chatbot,
@@ -106,12 +110,17 @@ class ChatProvider with ChangeNotifier {
         text: value,
       );
 
-      _isTyping = false;
-      notifyListeners();
       addMessage(answerMessage);
+      isTyping = false;
     }).catchError((_) {
-      _isTyping = false;
-      notifyListeners();
+      final answerMessage = types.TextMessage(
+        author: chatbot,
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+        id: randomString,
+        text: 'An error occurred.',
+      );
+      addMessage(answerMessage);
+      isTyping = false;
     });
   }
 }
