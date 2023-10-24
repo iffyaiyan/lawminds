@@ -46,7 +46,7 @@ class PrimaryLayout extends StatelessWidget {
                         color: Colors.white,
                       ),
                       child: SingleChildScrollView(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                         child: body,
                       ),
                     ),

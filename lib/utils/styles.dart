@@ -30,6 +30,7 @@ class Styles {
     filled: fillColor != null,
     prefixIcon: prefixIcon,
     floatingLabelBehavior: FloatingLabelBehavior.always,
+    isDense: true,
   );
 
   static ButtonStyle primaryElevatedButton = ElevatedButton.styleFrom(
