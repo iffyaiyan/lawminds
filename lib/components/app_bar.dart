@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../constants/assets.dart';
 import '../utils/prefs.dart';
@@ -22,7 +23,8 @@ class ProfileAppBar extends StatelessWidget implements PreferredSizeWidget {
               child: Image.asset(Assets.iconProfile),
             ),
             offset: const Offset(0.0, kToolbarHeight),
-            onSelected: (int val) {
+            onSelected: (int val) async {
+              await Supabase.instance.client.auth.signOut();
               Prefs.setIsLogin(false);
               Navigator.pushReplacementNamed(context, Routes.login);
             },
