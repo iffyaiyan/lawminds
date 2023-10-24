@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lawminds/models/topic.dart';
+import 'package:lawminds/providers/chat.dart';
+import 'package:lawminds/utils/routes.dart';
+import 'package:provider/provider.dart';
 
 class TopicItem extends StatelessWidget {
   final Topic item;
@@ -18,7 +21,8 @@ class TopicItem extends StatelessWidget {
         ),
         child: InkWell(
           onTap: () {
-            //Navigator.pushNamed(context, '');
+            context.read<ChatProvider>().selectedTopic = item;
+            Navigator.pushNamed(context, Routes.chat);
           },
           child: Column(
             children: [
