@@ -37,6 +37,10 @@ class _ChatScreenState extends State<ChatScreen> {
         showUserAvatars: true,
         showUserNames: true,
         user: context.watch<ChatProvider>().user,
+        typingIndicatorOptions: TypingIndicatorOptions(
+          typingUsers: [if (context.watch<ChatProvider>().isTyping) context.read<ChatProvider>().chatbot],
+        ),
+        inputOptions: InputOptions(enabled: !context.watch<ChatProvider>().isTyping),
       ),
     );
   }
