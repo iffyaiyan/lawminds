@@ -71,6 +71,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       return 'Password is required!';
                     }
 
+                    if (val.length < 6) {
+                      return 'Password length must be at least 6!';
+                    }
+
                     return null;
                   },
                 ),
@@ -136,9 +140,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (_formKey.currentState!.validate()) {
       context.read<AuthProvider>().register(_emailController.text, _passwordController.text).then((_) {
         Navigator.pushReplacementNamed(context, Routes.dashboard);
-      }).catchError((_) {
+      }).catchError((e) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Signup failed'),
+          content: Text('Sign Up Error'),
           backgroundColor: Colors.red,
         ));
       });
