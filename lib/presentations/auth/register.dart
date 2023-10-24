@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../components/primary_layout.dart';
 import '../../providers/auth.dart';
+import '../../utils/routes.dart';
 import '../../utils/styles.dart';
 import '../../utils/validators.dart';
 
@@ -61,7 +62,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       return 'Email is required!';
                     }
 
-                    if (Validators.isValidEmail(val)) {
+                    if (!Validators.isValidEmail(val)) {
                       return 'Email is invalid!';
                     }
 
@@ -151,7 +152,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   //action functions
   void onSubmit() {
     if (_formKey.currentState!.validate()) {
-
+      Navigator.pushReplacementNamed(context, Routes.dashboard);
     }
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'providers/auth.dart';
+import 'providers/providers.dart';
 import 'utils/routes.dart';
 
 void main() {
@@ -16,15 +16,17 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => ChatProvider()),
       ],
       child: MaterialApp(
-        title: 'Law Minds',
+        title: 'LawMinds',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
           useMaterial3: true,
         ),
         routes: Routes.routes,
-        initialRoute: '/login',
+        initialRoute: Routes.login,
       ),
     );
   }
