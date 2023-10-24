@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../utils/prefs.dart';
+
 class AuthProvider with ChangeNotifier {
   final _supabase = Supabase.instance.client;
 
@@ -41,22 +43,30 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> signIn(String email, String password) async {
+    isLoginProcess = true;
+    await Prefs.setIsLogin(true);
     try {
       await _supabase.auth.signInWithPassword(
         email: email,
         password: password,
       );
+
+      isLoginProcess = false;
     } catch (e) {
       log('$e');
     }
   }
 
   Future<void> register(String email, String password) async {
+    isRegisterProcess = true;
+    await Prefs.setIsLogin(true);
     try {
       await _supabase.auth.signUp(
         email: email,
         password: password,
       );
+
+      isRegisterProcess = false;
     } catch (e) {
       log('$e');
     }
