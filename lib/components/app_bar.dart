@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../constants/assets.dart';
+import '../utils/prefs.dart';
 import '../utils/routes.dart';
 
 class ProfileAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -22,6 +23,7 @@ class ProfileAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
             offset: const Offset(0.0, kToolbarHeight),
             onSelected: (int val) {
+              Prefs.setIsLogin(false);
               Navigator.pushReplacementNamed(context, Routes.login);
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[

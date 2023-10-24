@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../components/primary_layout.dart';
 import '../../providers/auth.dart';
+import '../../utils/prefs.dart';
 import '../../utils/routes.dart';
 import '../../utils/styles.dart';
 import '../../utils/validators.dart';
@@ -127,8 +128,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             width: double.infinity,
             child: ElevatedButton(
               style: Styles.primaryElevatedButton,
-              onPressed: context.read<AuthProvider>().isLoginProcess ? null : onSubmit,
-              child: context.watch<AuthProvider>().isLoginProcess
+              onPressed: context.read<AuthProvider>().isRegisterProcess ? null : onSubmit,
+              child: context.watch<AuthProvider>().isRegisterProcess
                   ? const SizedBox(height: 25, width: 25, child: CircularProgressIndicator(backgroundColor: Colors.indigo, color: Colors.white, strokeWidth: 3))
                   : const Text('Register'),
             ),
@@ -150,8 +151,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   //action functions
-  void onSubmit() {
+  Future<void> onSubmit() async {
     if (_formKey.currentState!.validate()) {
+      context.read<AuthProvider>().isRegisterProcess = true;
+      await Prefs.setIsLogin(true);
+      if (!mounted) return;
+      context.read<AuthProvider>().isRegisterProcess = false;
       Navigator.pushReplacementNamed(context, Routes.dashboard);
     }
   }
