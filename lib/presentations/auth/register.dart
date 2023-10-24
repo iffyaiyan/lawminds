@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../../components/primary_layout.dart';
 import '../../providers/auth.dart';
-import '../../utils/prefs.dart';
 import '../../utils/routes.dart';
 import '../../utils/styles.dart';
 import '../../utils/validators.dart';
@@ -16,7 +15,6 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -33,23 +31,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             key: _formKey,
             child: Column(
               children: [
-                TextFormField(
-                  controller: _nameController,
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.next,
-                  decoration: Styles.outlineTextField(
-                    label: 'Name',
-                    hint: 'Enter your name',
-                  ),
-                  validator: (val) {
-                    if (val == null || val.trim().isEmpty) {
-                      return 'Name is required!';
-                    }
-
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 20),
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -88,6 +69,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   validator: (val) {
                     if (val == null || val.trim().isEmpty) {
                       return 'Password is required!';
+                    }
+
+                    if (val.length < 6) {
+                      return 'Password length must be at least 6!';
                     }
 
                     return null;
@@ -153,11 +138,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
   //action functions
   Future<void> onSubmit() async {
     if (_formKey.currentState!.validate()) {
-      context.read<AuthProvider>().isRegisterProcess = true;
-      await Prefs.setIsLogin(true);
-      if (!mounted) return;
-      context.read<AuthProvider>().isRegisterProcess = false;
-      Navigator.pushReplacementNamed(context, Routes.dashboard);
+      context.read<AuthProvider>().register(_emailController.text, _passwordController.text).then((_) {
+        Navigator.pushReplacementNamed(context, Routes.dashboard);
+      }).catchError((e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('$e'),
+          backgroundColor: Colors.red,
+        ));
+      });
     }
   }
 }

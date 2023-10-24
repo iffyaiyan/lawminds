@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../../components/primary_layout.dart';
 import '../../providers/auth.dart';
-import '../../utils/prefs.dart';
 import '../../utils/routes.dart';
 import '../../utils/styles.dart';
 
@@ -103,11 +102,14 @@ class _LoginScreenState extends State<LoginScreen> {
   //action functions
   Future<void> onSubmit() async {
     if (_formKey.currentState!.validate()) {
-      context.read<AuthProvider>().isLoginProcess = true;
-      await Prefs.setIsLogin(true);
-      if (!mounted) return;
-      context.read<AuthProvider>().isLoginProcess = false;
-      Navigator.pushReplacementNamed(context, Routes.dashboard);
+      context.read<AuthProvider>().signIn(_emailController.text, _passwordController.text).then((_) {
+        Navigator.pushReplacementNamed(context, Routes.dashboard);
+      }).catchError((e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('$e'),
+          backgroundColor: Colors.red,
+        ));
+      });
     }
   }
 }

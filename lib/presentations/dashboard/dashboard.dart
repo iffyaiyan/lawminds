@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../components/app_bar.dart';
-import '../../providers/user.dart';
 import 'widget/topic.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -31,15 +29,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   //widget functions
-  Widget get _welcome => Column(
+  Widget get _welcome => const Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text('Hi ${context.watch<UserProvider>().name}',
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
-      const Text('Welcome to LawMinds!',
+      Text('Hi,',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
+      Text('Welcome to LawMinds!',
           style: TextStyle(fontSize: 18, color: Colors.indigo)),
-      const Divider(color: Colors.indigo, thickness: 0.5),
-      const SizedBox(height: 20),
+      Divider(color: Colors.indigo, thickness: 0.5),
+      SizedBox(height: 20),
     ],
   );
 }
