@@ -3,6 +3,7 @@ import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/chat.dart';
+import '../../utils/routes.dart';
 import 'widget/suggestion_item.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -17,10 +18,14 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+            onPressed: () => Navigator.pushReplacementNamed(context, Routes.dashboard),
+            icon: const Icon(Icons.arrow_back_ios_new)
+        ),
         backgroundColor: Colors.black,
         elevation: 10,
         foregroundColor: Colors.white,
-        title: Text(context.watch<ChatProvider>().selectedTopic?.title ?? ''),
+        title: Text(context.watch<ChatProvider>().selectedTopic?.title ?? 'Consult'),
         actions: [
           IconButton(onPressed: () => context.read<ChatProvider>().startNewSession(), icon: const Icon(Icons.refresh)),
         ],

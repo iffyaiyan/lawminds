@@ -126,7 +126,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const Text("Already have an account?"),
               TextButton(
                 child: const Text('Login'),
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => Navigator.pushReplacementNamed(context, Routes.login),
               ),
             ],
           ),
