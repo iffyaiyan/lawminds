@@ -122,12 +122,6 @@ class ChatProvider with ChangeNotifier {
           );
 
           addMessage(aiMessage);
-
-          ChatService().getFollowUp(_sessionId!).then((value) {
-            suggestions = value.cast();
-          }).catchError((_) {
-            suggestions = [];
-          });
         } else {
           answer = '$answer$msg';
           _messages.first = (_messages.first as types.TextMessage).copyWith(text: answer);
@@ -136,6 +130,12 @@ class ChatProvider with ChangeNotifier {
       }
 
     }).whenComplete(() {
+      ChatService().getFollowUp(_sessionId!).then((value) {
+        suggestions = value.cast();
+      }).catchError((_) {
+        suggestions = [];
+      });
+
       isTyping = false;
     });
   }
