@@ -1,0 +1,10 @@
+SUPABASE_URL = https://cmvoypjbhdnsfrfoygco.supabase.co
+SUPABASE_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNtdm95cGpiaGRuc2ZyZm95Z2NvIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTgxNTk5NzYsImV4cCI6MjAxMzczNTk3Nn0.vaiW5_TEei4SQsUS2PpLQzneecpNjldkB7HEg0F435w
+AI21_API_KEY=CrmkGU9VrtjKPbuQ16vi1TWS2U5Fjb0f
+API_KEY="CrmkGU9VrtjKPbuQ16vi1TWS2U5Fjb0f"
+API_URL= http://10.0.2.2:5000
+SUPABASE_URL = https://cmvoypjbhdnsfrfoygco.supabase.co
+SUPABASE_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNtdm95cGpiaGRuc2ZyZm95Z2NvIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTgxNTk5NzYsImV4cCI6MjAxMzczNTk3Nn0.vaiW5_TEei4SQsUS2PpLQzneecpNjldkB7HEg0F435w
+AI21_API_KEY=CrmkGU9VrtjKPbuQ16vi1TWS2U5Fjb0f
+API_KEY="CrmkGU9VrtjKPbuQ16vi1TWS2U5Fjb0f"
+API_URL= https://lawminds-service-production.up.railway.app 

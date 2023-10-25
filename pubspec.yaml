@@ -34,6 +34,7 @@ flutter:
     - assets/images/
     - assets/icons/
     - .env
+    - dotenv
 
 
 flutter_launcher_icons:
