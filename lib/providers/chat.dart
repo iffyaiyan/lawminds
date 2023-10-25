@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:lawminds/services/chat.dart';
@@ -61,7 +62,11 @@ class ChatProvider with ChangeNotifier {
 
     addMessage(textMessage);
 
-    chatWithStreamEvent(message);
+    if (kIsWeb) {
+      chat(message);
+    } else {
+      chatWithStreamEvent(message);
+    }
   }
 
   Future<void> onSendPressed(types.PartialText message) async {
@@ -74,10 +79,38 @@ class ChatProvider with ChangeNotifier {
 
     addMessage(textMessage);
 
-    chatWithStreamEvent(message.text);
+    if (kIsWeb) {
+      chat(message.text);
+    } else {
+      chatWithStreamEvent(message.text);
+    }
+  }
+
+  void chat(String message) {
+    _sessionId ??= const Uuid().v4();
+    isTyping = true;
+    ChatService().chat(message, _sessionId!).then((value) {
+      final aiMessage = types.TextMessage(
+        author: chatbot,
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+        id: const Uuid().v4(),
+        text: value,
+      );
+
+      addMessage(aiMessage);
+    }).whenComplete(() {
+      ChatService().getFollowUp(_sessionId!).then((value) {
+        suggestions = value.cast();
+      }).catchError((_) {
+        suggestions = [];
+      });
+
+      isTyping = false;
+    });
   }
 
   void chatWithStream(String message) {
+    _sessionId ??= const Uuid().v4();
     isTyping = true;
     String? answer;
     ChatService().chatWithStream(message, _sessionId!, (String dataChunk) {
@@ -104,10 +137,19 @@ class ChatProvider with ChangeNotifier {
         text: e,
       );
       addMessage(answerMessage);
-    }).whenComplete(() => isTyping = false);
+    }).whenComplete(() {
+      ChatService().getFollowUp(_sessionId!).then((value) {
+        suggestions = value.cast();
+      }).catchError((_) {
+        suggestions = [];
+      });
+
+      isTyping = false;
+    });
   }
 
   void chatWithStreamEvent(String message) {
+    _sessionId ??= const Uuid().v4();
     isTyping = true;
     String? answer;
     ChatService().chatWithStreamEvent(message, _sessionId!, (msg) {
