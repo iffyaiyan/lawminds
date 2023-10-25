@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
@@ -52,6 +53,51 @@ class ChatService {
       }
     } catch (_) {
       rethrow;
+    } finally {
+      client.close();
+    }
+  }
+
+  Future<void> chatWithStreamEvent(String message, String sessionId, Function(String?) onDataReceived) async {
+    final url = '${dotenv.env['API_URL'] ?? ''}/chat/stream-events';
+    final Map<String, dynamic> data = {'session_id': sessionId, 'message': message};
+    final client = http.Client();
+
+    try {
+      final request = http.Request('POST', Uri.parse(url));
+      request.body = jsonEncode(data);
+      request.headers['Content-Type'] = 'application/json';
+      final response = await client.send(request);
+
+      if (response.statusCode != 200) {
+        log('onError: $response');
+        throw 'An error occurred';
+      }
+
+      String buffer = '';
+      await for (var chunk in response.stream.transform(utf8.decoder)) {
+        buffer += chunk;
+
+        try {
+          final json = jsonDecode(buffer);
+
+          if (json['ops'] is List && json['ops'].isNotEmpty) {
+            final path = json['ops'][0]['path'];
+
+            if (path == '/logs/ChatOpenAI:2/streamed_output_str/-') {
+              onDataReceived(json['ops'][0]['value']);
+            }
+          }
+
+          log('onResponse: $buffer');
+
+          buffer = '';
+        } catch (_) {}
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
     } finally {
       client.close();
     }

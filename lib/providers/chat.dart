@@ -91,9 +91,13 @@ class ChatProvider with ChangeNotifier {
 
     addMessage(textMessage);
 
+    chatWithStreamEvent(message.text);
+  }
+
+  void chatWithStream(String message) {
     isTyping = true;
     String? answer;
-    ChatService().chatWithStream(message.text, _sessionId!, (String dataChunk) {
+    ChatService().chatWithStream(message, _sessionId!, (String dataChunk) {
       if (answer == null) {
         answer = dataChunk;
         final aiMessage = types.TextMessage(
@@ -117,7 +121,30 @@ class ChatProvider with ChangeNotifier {
         text: e,
       );
       addMessage(answerMessage);
-      isTyping = false;
+    }).whenComplete(() => isTyping = false);
+  }
+
+  void chatWithStreamEvent(String message) {
+    isTyping = true;
+    String? answer;
+    ChatService().chatWithStreamEvent(message, _sessionId!, (msg) {
+      if (msg != null) {
+        if (answer == null) {
+          answer = msg;
+          final aiMessage = types.TextMessage(
+            author: chatbot,
+            createdAt: DateTime.now().millisecondsSinceEpoch,
+            id: const Uuid().v4(),
+            text: answer!,
+          );
+
+          addMessage(aiMessage);
+        } else {
+          answer = '$answer$msg';
+          _messages.first = (_messages.first as types.TextMessage).copyWith(text: answer);
+          notifyListeners();
+        }
+      }
     }).whenComplete(() => isTyping = false);
   }
 
