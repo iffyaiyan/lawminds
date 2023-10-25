@@ -13,14 +13,6 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ChatProvider>().loadMessages();
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -28,6 +20,9 @@ class _ChatScreenState extends State<ChatScreen> {
         elevation: 10,
         foregroundColor: Colors.white,
         title: Text(context.watch<ChatProvider>().selectedTopic?.title ?? ''),
+        actions: [
+          IconButton(onPressed: () => context.read<ChatProvider>().startNewSession(), icon: const Icon(Icons.refresh)),
+        ],
       ),
       body: Chat(
         messages: context.watch<ChatProvider>().messages,

@@ -1,9 +1,7 @@
-import 'dart:convert';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:lawminds/services/chat.dart';
+import 'package:uuid/uuid.dart';
 
 import '../constants/assets.dart';
 import '../models/topic.dart';
@@ -20,6 +18,7 @@ class ChatProvider with ChangeNotifier {
   final user = const types.User(id: 'user', firstName: 'You');
   final chatbot = const types.User(id: 'chatbot', firstName: 'Bot');
   bool _isTyping = false;
+  String? _sessionId;
 
   List<Topic> get topics => _topics;
   Topic? get selectedTopic => _selectedTopic;
@@ -31,19 +30,10 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  String get randomString {
-    final random = Random.secure();
-    final values = List<int>.generate(16, (i) => random.nextInt(255));
-    return base64UrlEncode(values);
-  }
-
   void initChat(Topic item) {
     _selectedTopic = item;
-    _messages.clear();
-    notifyListeners();
+    startNewSession();
   }
-
-  void loadMessages() {}
 
   void addMessage(types.Message message) {
     _messages.insert(0, message);
@@ -95,18 +85,18 @@ class ChatProvider with ChangeNotifier {
     final textMessage = types.TextMessage(
       author: user,
       createdAt: DateTime.now().millisecondsSinceEpoch,
-      id: randomString,
+      id: const Uuid().v4(),
       text: message.text,
     );
 
     addMessage(textMessage);
 
     isTyping = true;
-    ChatService().getAnswer(message.text).then((value) {
+    ChatService().chat(message.text, _sessionId!).then((value) {
       final answerMessage = types.TextMessage(
         author: chatbot,
         createdAt: DateTime.now().millisecondsSinceEpoch,
-        id: randomString,
+        id: const Uuid().v4(),
         text: value,
       );
 
@@ -116,11 +106,17 @@ class ChatProvider with ChangeNotifier {
       final answerMessage = types.TextMessage(
         author: chatbot,
         createdAt: DateTime.now().millisecondsSinceEpoch,
-        id: randomString,
+        id: const Uuid().v4(),
         text: e,
       );
       addMessage(answerMessage);
       isTyping = false;
     });
+  }
+
+  void startNewSession() {
+    _sessionId = const Uuid().v4();
+    _messages.clear();
+    notifyListeners();
   }
 }

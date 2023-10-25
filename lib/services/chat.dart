@@ -5,20 +5,29 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class ChatService {
-  Future<String> getAnswer(String q) async {
+  Future<String> chat(String message, String sessionId) async {
     try {
-      final response = await http.get(Uri.parse('${dotenv.env['API_URL'] ?? ''}?question=$q'));
+      final url = '${dotenv.env['API_URL'] ?? ''}/chat';
+      final Map<String, dynamic> data = {'session_id': sessionId, 'message': message};
+      final Map<String, String> header = {
+        'Content-Type': 'application/json',
+      };
+      final response = await http.post(Uri.parse(url), body: json.encode(data), headers: header);
+
+      log('onRequest: $url\nbody: $data');
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
-        return json['answer'] ?? json['detail'] ?? 'An error occurred';
+        if (json.isEmpty) return 'No response received from bot';
+        return json;
       } else {
-        log('Catch Response Error: ${response.body}');
-        throw 'An error occurred';
+        final json = jsonDecode(response.body);
+
+        log('onError: ${response.body}');
+        throw json['detail'] ?? 'An error occurred';
       }
     } catch (e) {
-      log('Catch Error: $e');
-      throw 'An error occurred';
+      throw '$e';
     }
   }
 }
