@@ -12,7 +12,7 @@ class ChatService {
       final Map<String, String> header = {
         'Content-Type': 'application/json',
       };
-      final response = await http.post(Uri.parse(url), body: json.encode(data), headers: header);
+      final response = await http.post(Uri.parse(url), body: jsonEncode(data), headers: header);
 
       log('onRequest: $url\nbody: $data');
 
@@ -26,8 +26,34 @@ class ChatService {
         log('onError: ${response.body}');
         throw json['detail'] ?? 'An error occurred';
       }
-    } catch (e) {
-      throw '$e';
+    } catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<void> chatWithStream(String message, String sessionId, Function(String) onDataReceived) async {
+    final url = '${dotenv.env['API_URL'] ?? ''}/chat/stream';
+    final Map<String, dynamic> data = {'session_id': sessionId, 'message': message};
+    final client = http.Client();
+
+    try {
+      final request = http.Request('POST', Uri.parse(url));
+      request.body = jsonEncode(data);
+      request.headers['Content-Type'] = 'application/json';
+      final response = await client.send(request);
+
+      if (response.statusCode != 200) {
+        log('onError: $response');
+        throw 'An error occurred';
+      }
+
+      await for (var chunk in response.stream.transform(utf8.decoder)) {
+        onDataReceived(chunk);
+      }
+    } catch (_) {
+      rethrow;
+    } finally {
+      client.close();
     }
   }
 }

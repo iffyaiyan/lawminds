@@ -92,16 +92,23 @@ class ChatProvider with ChangeNotifier {
     addMessage(textMessage);
 
     isTyping = true;
-    ChatService().chat(message.text, _sessionId!).then((value) {
-      final answerMessage = types.TextMessage(
-        author: chatbot,
-        createdAt: DateTime.now().millisecondsSinceEpoch,
-        id: const Uuid().v4(),
-        text: value,
-      );
+    String? answer;
+    ChatService().chatWithStream(message.text, _sessionId!, (String dataChunk) {
+      if (answer == null) {
+        answer = dataChunk;
+        final aiMessage = types.TextMessage(
+          author: chatbot,
+          createdAt: DateTime.now().millisecondsSinceEpoch,
+          id: const Uuid().v4(),
+          text: answer!,
+        );
 
-      addMessage(answerMessage);
-      isTyping = false;
+        addMessage(aiMessage);
+      } else {
+        answer = '$answer$dataChunk';
+        _messages.first = (_messages.first as types.TextMessage).copyWith(text: answer);
+        notifyListeners();
+      }
     }).catchError((e) {
       final answerMessage = types.TextMessage(
         author: chatbot,
@@ -111,7 +118,7 @@ class ChatProvider with ChangeNotifier {
       );
       addMessage(answerMessage);
       isTyping = false;
-    });
+    }).whenComplete(() => isTyping = false);
   }
 
   void startNewSession() {
