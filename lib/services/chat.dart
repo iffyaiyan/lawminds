@@ -58,7 +58,7 @@ class ChatService {
     }
   }
 
-  Future<void> chatWithStreamEvent(String message, String sessionId, Function(String?, List<String>?) onDataReceived) async {
+  Future<void> chatWithStreamEvent(String message, String sessionId, Function(String?) onDataReceived) async {
     final url = '${dotenv.env['API_URL'] ?? ''}/chat/stream-events';
     final Map<String, dynamic> data = {'session_id': sessionId, 'message': message};
     final client = http.Client();
@@ -84,17 +84,12 @@ class ChatService {
           if (json['ops'] is List && json['ops'].isNotEmpty) {
             final path = json['ops'][0]['path'];
             String? answer;
-            List<dynamic>? suggestions;
+
             if (path == '/logs/ChatOpenAI:2/streamed_output_str/-') {
               answer = json['ops'][0]['value'];
             }
 
-            if (path == '/logs/GenerateQueries/final_output') {
-              suggestions = json['ops'][0]['value'] == null || json['ops'][0]['value']['output'] == null ? []
-                  : json['ops'][0]['value']['output'];
-            }
-
-            onDataReceived(answer, suggestions?.map((item) => item.toString()).toList());
+            onDataReceived(answer);
           }
 
           buffer = '';
@@ -106,6 +101,30 @@ class ChatService {
       }
     } finally {
       client.close();
+    }
+  }
+
+  Future<List<dynamic>> getFollowUp(String sessionId) async {
+    try {
+      final url = '${dotenv.env['API_URL'] ?? ''}/chat/follow-up-suggestions';
+      final Map<String, dynamic> data = {'session_id': sessionId};
+      final Map<String, String> header = {
+        'Content-Type': 'application/json',
+      };
+      final response = await http.post(Uri.parse(url), body: jsonEncode(data), headers: header);
+
+      log('onRequest: $url\nbody: $data');
+      log('onResponse: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        if (json.isEmpty) return [];
+        return json['follow_ups'] ?? [];
+      } else {
+        throw [];
+      }
+    } catch (_) {
+      rethrow;
     }
   }
 }

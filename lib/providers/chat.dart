@@ -110,7 +110,7 @@ class ChatProvider with ChangeNotifier {
   void chatWithStreamEvent(String message) {
     isTyping = true;
     String? answer;
-    ChatService().chatWithStreamEvent(message, _sessionId!, (msg, suggestions) {
+    ChatService().chatWithStreamEvent(message, _sessionId!, (msg) {
       if (msg != null) {
         if (answer == null) {
           answer = msg;
@@ -122,6 +122,12 @@ class ChatProvider with ChangeNotifier {
           );
 
           addMessage(aiMessage);
+
+          ChatService().getFollowUp(_sessionId!).then((value) {
+            suggestions = value.cast();
+          }).catchError((_) {
+            suggestions = [];
+          });
         } else {
           answer = '$answer$msg';
           _messages.first = (_messages.first as types.TextMessage).copyWith(text: answer);
@@ -129,11 +135,9 @@ class ChatProvider with ChangeNotifier {
         }
       }
 
-      if (suggestions != null) {
-        this.suggestions = suggestions;
-      }
-
-    }).whenComplete(() => isTyping = false);
+    }).whenComplete(() {
+      isTyping = false;
+    });
   }
 
   void startNewSession() {
