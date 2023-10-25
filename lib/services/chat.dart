@@ -58,7 +58,7 @@ class ChatService {
     }
   }
 
-  Future<void> chatWithStreamEvent(String message, String sessionId, Function(String?) onDataReceived) async {
+  Future<void> chatWithStreamEvent(String message, String sessionId, Function(String?, List<String>?) onDataReceived) async {
     final url = '${dotenv.env['API_URL'] ?? ''}/chat/stream-events';
     final Map<String, dynamic> data = {'session_id': sessionId, 'message': message};
     final client = http.Client();
@@ -83,13 +83,19 @@ class ChatService {
 
           if (json['ops'] is List && json['ops'].isNotEmpty) {
             final path = json['ops'][0]['path'];
-
+            String? answer;
+            List<dynamic>? suggestions;
             if (path == '/logs/ChatOpenAI:2/streamed_output_str/-') {
-              onDataReceived(json['ops'][0]['value']);
+              answer = json['ops'][0]['value'];
             }
-          }
 
-          log('onResponse: $buffer');
+            if (path == '/logs/GenerateQueries/final_output') {
+              suggestions = json['ops'][0]['value'] == null || json['ops'][0]['value']['output'] == null ? []
+                  : json['ops'][0]['value']['output'];
+            }
+
+            onDataReceived(answer, suggestions?.map((item) => item.toString()).toList());
+          }
 
           buffer = '';
         } catch (_) {}

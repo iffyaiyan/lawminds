@@ -3,6 +3,7 @@ import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/chat.dart';
+import 'widget/suggestion_item.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -26,8 +27,6 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       body: Chat(
         messages: context.watch<ChatProvider>().messages,
-        onMessageTap: context.read<ChatProvider>().onMessageTap,
-        onPreviewDataFetched: context.read<ChatProvider>().onPreviewDataFetched,
         onSendPressed: context.read<ChatProvider>().onSendPressed,
         showUserAvatars: true,
         showUserNames: true,
@@ -35,8 +34,38 @@ class _ChatScreenState extends State<ChatScreen> {
         typingIndicatorOptions: TypingIndicatorOptions(
           typingUsers: [if (context.watch<ChatProvider>().isTyping) context.read<ChatProvider>().chatbot],
         ),
-        inputOptions: InputOptions(enabled: !context.watch<ChatProvider>().isTyping),
+        customBottomWidget: _bottomWidget(),
       ),
+    );
+  }
+
+  Widget _bottomWidget() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        if (context.watch<ChatProvider>().suggestions.isNotEmpty) ...[
+          const SizedBox(height: 5),
+          SizedBox(
+            height: 50,
+            child: ListView.builder(
+                padding: const EdgeInsets.only(right: 8),
+                itemCount: context.watch<ChatProvider>().suggestions.length,
+                scrollDirection: Axis.horizontal,
+                shrinkWrap: true,
+                itemBuilder: (BuildContext context, int index) {
+                  return SuggestionItem(
+                    item: context.watch<ChatProvider>().suggestions[index],
+                    onTap: () => context.read<ChatProvider>().onSuggestionPressed(context.read<ChatProvider>().suggestions[index]),
+                  );
+                }
+            ),
+          ),
+        ],
+        Input(
+          onSendPressed: context.read<ChatProvider>().onSendPressed,
+          options: InputOptions(enabled: !context.watch<ChatProvider>().isTyping),
+        ),
+      ],
     );
   }
 }

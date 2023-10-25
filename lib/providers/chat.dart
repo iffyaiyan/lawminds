@@ -19,14 +19,21 @@ class ChatProvider with ChangeNotifier {
   final chatbot = const types.User(id: 'chatbot', firstName: 'Bot');
   bool _isTyping = false;
   String? _sessionId;
+  List<String> _suggestions = [];
 
   List<Topic> get topics => _topics;
   Topic? get selectedTopic => _selectedTopic;
   List<types.Message> get messages => _messages;
   bool get isTyping => _isTyping;
+  List<String> get suggestions => _suggestions;
 
   set isTyping(bool val) {
     _isTyping = val;
+    notifyListeners();
+  }
+
+  set suggestions(List<String> val) {
+    _suggestions = val;
     notifyListeners();
   }
 
@@ -41,44 +48,20 @@ class ChatProvider with ChangeNotifier {
   }
 
   void onMessageTap(BuildContext _, types.Message message) async {
-    if (message is types.FileMessage) {
-      if (message.uri.startsWith('http')) {
-        try {
-          final index =
-          _messages.indexWhere((element) => element.id == message.id);
-          final updatedMessage =
-          (_messages[index] as types.FileMessage).copyWith(
-            isLoading: true,
-          );
-
-          _messages[index] = updatedMessage;
-          notifyListeners();
-
-        } finally {
-          final index = _messages.indexWhere((element) => element.id == message.id);
-          final updatedMessage =
-          (_messages[index] as types.FileMessage).copyWith(
-            isLoading: null,
-          );
-
-          _messages[index] = updatedMessage;
-          notifyListeners();
-        }
-      }
-    }
+    //final index = _messages.indexWhere((element) => element.id == message.id);
   }
 
-  void onPreviewDataFetched(
-      types.TextMessage message,
-      types.PreviewData previewData,
-      ) {
-    final index = _messages.indexWhere((element) => element.id == message.id);
-    final updatedMessage = (_messages[index] as types.TextMessage).copyWith(
-      previewData: previewData,
+  Future<void> onSuggestionPressed(String message) async {
+    final textMessage = types.TextMessage(
+      author: user,
+      createdAt: DateTime.now().millisecondsSinceEpoch,
+      id: const Uuid().v4(),
+      text: message,
     );
 
-    _messages[index] = updatedMessage;
-    notifyListeners();
+    addMessage(textMessage);
+
+    chatWithStreamEvent(message);
   }
 
   Future<void> onSendPressed(types.PartialText message) async {
@@ -127,7 +110,7 @@ class ChatProvider with ChangeNotifier {
   void chatWithStreamEvent(String message) {
     isTyping = true;
     String? answer;
-    ChatService().chatWithStreamEvent(message, _sessionId!, (msg) {
+    ChatService().chatWithStreamEvent(message, _sessionId!, (msg, suggestions) {
       if (msg != null) {
         if (answer == null) {
           answer = msg;
@@ -145,12 +128,19 @@ class ChatProvider with ChangeNotifier {
           notifyListeners();
         }
       }
+
+      if (suggestions != null) {
+        this.suggestions = suggestions;
+      }
+
     }).whenComplete(() => isTyping = false);
   }
 
   void startNewSession() {
     _sessionId = const Uuid().v4();
     _messages.clear();
+    _suggestions.clear();
+    _isTyping = false;
     notifyListeners();
   }
 }
